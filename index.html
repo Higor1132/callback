@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Retorno de autorização</title>
+<style>
+:root{color-scheme:light dark;--bg:#ffffff;--tx:#15171c;--mut:#5b6170;--bd:#d9dce3;--ac:#1f3a8a;--ok:#15803d;--err:#b91c1c}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--tx:#e8eaee;--mut:#a7adb9;--bd:#2b303a;--ac:#8fb0ff;--ok:#4ade80;--err:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:48px max(16px,5vw)}
+main{max-width:640px;margin:0 auto}
+h1{font-size:28px;line-height:1.15;margin:0 0 8px}
+p{margin:8px 0}.m{color:var(--mut);font-size:14px}
+.box{border:1px solid var(--bd);border-radius:10px;padding:16px;margin:20px 0}
+code{display:block;font:15px/1.4 ui-monospace,Consolas,monospace;padding:12px;border-radius:8px;border:1px solid var(--bd);overflow-wrap:anywhere;user-select:all}
+button{font:inherit;font-weight:600;margin-top:10px;padding:10px 16px;border-radius:8px;border:0;background:var(--ac);color:#fff;cursor:pointer}
+.ok{color:var(--ok);font-weight:600}.err{color:var(--err);font-weight:600}
+ol{padding-left:20px}
+</style>
+</head>
+<body>
+<main>
+<h1 id="titulo">Retorno de autorização</h1>
+<p class="m">LOJA HA · página de retorno dos aplicativos do Mercado Livre e do TikTok Shop.</p>
+
+<div class="box" id="resultado"><p>Nenhum código recebido. Esta página só mostra algo quando um marketplace redireciona para cá depois que você autoriza o aplicativo.</p></div>
+
+<div class="box">
+<p><b>Como usar o código</b></p>
+<ol>
+<li>Copie o código acima.</li>
+<li>No seu computador, na pasta do projeto, rode o comando do marketplace:<br>
+<span class="m">Mercado Livre:</span> <code>python mercadolivre/ml_motor.py codigo SEU_CODIGO</code>
+<span class="m">TikTok Shop:</span> <code>python tiktok/tts_cliente.py codigo SEU_CODIGO</code></li>
+<li>Use logo: o código expira em poucos minutos e só vale uma vez.</li>
+</ol>
+<p class="m">Esta página não envia o código para lugar nenhum: ele aparece só na sua tela. Não compartilhe o código com ninguém.</p>
+</div>
+</main>
+<script>
+{
+const q=new URLSearchParams(location.search);
+const code=q.get('code')||q.get('auth_code');
+const erro=q.get('error')||q.get('error_description');
+const box=document.getElementById('resultado');
+if(code||erro){
+  history.replaceState(null,'',location.pathname); // tira o código do endereço e do histórico do navegador
+  box.textContent='';
+  if(code){
+    const t=document.createElement('p');t.className='ok';t.textContent='Autorização recebida. Seu código:';
+    const c=document.createElement('code');c.id='codigo';c.textContent=code;
+    const b=document.createElement('button');b.type='button';b.textContent='Copiar código';
+    b.onclick=async()=>{try{await navigator.clipboard.writeText(code);b.textContent='Copiado';}catch(e){b.textContent='Selecione e copie manualmente';}};
+    box.append(t,c,b);
+    const st=q.get('state');
+    if(st){const s=document.createElement('p');s.className='m';s.textContent='state: '+st;box.append(s);}
+  }
+  if(erro){
+    const e=document.createElement('p');e.className='err';e.textContent='A autorização não foi concluída: '+erro;
+    box.append(e);
+  }
+}
+}
+</script>
+</body>
+</html>
